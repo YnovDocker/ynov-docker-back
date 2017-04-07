@@ -1,6 +1,6 @@
 'use strict';
 //library
-const SwaggerExpress = require('swagger-express-mw'),
+const swaggerExpress = require('swagger-express-mw'),
     swaggerTools = require('swagger-tools'),
     path = require('path'),
     yaml = require('js-yaml'),
@@ -25,7 +25,7 @@ try {
 
         //initialize swagger.json
         let swaggerDoc = require(swaggerSpecFilePath);
-        swaggerDoc.host = 'localhost' + ':' + process.env.PORT || 10010;
+        swaggerDoc.host = 'localhost' + ':' + port;
 
 
         module.exports = app; // for testing
@@ -55,7 +55,7 @@ try {
             app.use(middleware.swaggerUi());
 
             // Start the server
-            SwaggerExpress.create(config, function (err, swaggerExpress) {
+            swaggerExpress.create(config, function (err, swaggerExpress) {
                 if (err) {
                     throw err;
                 }

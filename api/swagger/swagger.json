@@ -1,0 +1,107 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.1",
+        "title": "BackEnd"
+    },
+    "host": "localhost:10010",
+    "tags": [
+        {
+            "name": "Security",
+            "description": "login and permissions, email verify"
+        },
+        {
+            "name": "User",
+            "description": "account management"
+        }
+    ],
+    "basePath": "/api",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/user/register": {
+            "x-swagger-router-controller": "register",
+            "post": {
+                "description": "add a 'user' object to data",
+                "operationId": "addUser",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "userToAdd1",
+                        "in": "body",
+                        "description": "a 'user' object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/AddUserResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger": {
+            "x-swagger-pipe": "swagger_raw"
+        }
+    },
+    "definitions": {
+        "User": {
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "AddUserResponse": {
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
