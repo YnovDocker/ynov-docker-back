@@ -1,9 +1,10 @@
 /**
  * Created by tdoret on 24/03/2017.
  */
-'use strict';
+/* jshint node: true */
+/*jshint esversion: 6 */
 
-let util = require('util');
+'use strict';
 
 module.exports = {
     addUser: addUser
