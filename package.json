@@ -1,0 +1,28 @@
+{
+  "name": "api-node-swagger-empty",
+  "version": "0.0.1",
+  "private": true,
+  "description": "New Swagger API Project",
+  "keywords": [],
+  "author": "amaitre, TDoret, lnans, lmangeat",
+  "license": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.12.3",
+    "fs": "0.0.1-security",
+    "js-yaml": "^3.8.2",
+    "jsonfile": "^2.4.0",
+    "nodemon": "^1.11.0",
+    "swagger-express-mw": "^0.1.0",
+    "swagger-tools": "^0.10.1",
+    "yaml-to-json": "^0.3.0"
+  },
+  "devDependencies": {
+    "should": "^7.1.0",
+    "supertest": "^1.0.0"
+  },
+  "scripts": {
+    "start": "nodemon app.js -e js,yaml --ignore 'api/swagger/swagger.json'",
+    "test": "swagger project test"
+  }
+}
