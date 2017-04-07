@@ -8,7 +8,7 @@ const SwaggerExpress = require('swagger-express-mw'),
     jsonfile = require('jsonfile');
 
 //config variable
-const swaggerSpecFilePath = './dest/api/swagger/swagger.json';
+const swaggerSpecFilePath = __dirname + '/api/swagger.json';
 const port = process.env.PORT || 10010;
 
 //app
@@ -16,7 +16,7 @@ let app = require('express')();
 
 
 try {
-    const config = yaml.safeLoad(fs.readFileSync('./dest/api/swagger/swagger.yaml', 'utf8'));
+    const config = yaml.safeLoad(fs.readFileSync(__dirname + '/api/swagger.yaml', 'utf8'));
     const indentedJson = JSON.stringify(config, null, 4);
     //console.log(indentedJson);
     fs.writeFile(swaggerSpecFilePath, indentedJson, function (err) {
@@ -32,7 +32,11 @@ try {
 
         const config = {
             appRoot: __dirname, // required config
-            controllers: './src/api/controllers',
+            // swaggerFile: 'api/swagger.yaml',
+            // controllersDir: 'src/controllers',
+            // mockControllersDir: 'src/mocks',
+            // helpers: 'src/helpers',
+            controllers: __dirname + '/src/controllers',
             useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
         };
 
@@ -63,8 +67,6 @@ try {
                 console.log('Your server is listening on port %d (http://localhost:%d)', port, port);
             });
         });
-
-
     });
 } catch (e) {
     console.log(e);
