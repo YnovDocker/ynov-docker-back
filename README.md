@@ -1,2 +1,1 @@
-# ynov-docker
-Image Viewer
+# Skeleton project for Swagger
