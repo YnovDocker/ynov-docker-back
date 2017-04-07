@@ -14,8 +14,8 @@ swagger:
     _router:
       name: swagger_router
       mockMode: false
-      mockControllersDirs: [ api/mocks ]
-      controllersDirs: [ api/controllers ]
+      mockControllersDirs: [ src/mocks ]
+      controllersDirs: [ src/controllers ]
 
     _swagger_validate:
       name: swagger_validator

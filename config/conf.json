@@ -1,9 +1,9 @@
 {
   "AppPaths": {
-  // relative to appRoot
-  "swaggerFile": "api/swagger.yaml",
-  "controllersDir": "api/controllers",
-  "mockControllersDir": "api/mocks",
-  "helpers": "api/helpers"
-}
+    // relative to appRoot
+    "swaggerFile": "api/swagger.yaml",
+    "controllersDir": "src/controllers",
+    "mockControllersDir": "src/mocks",
+    "helpers": "src/helpers"
+  }
 }

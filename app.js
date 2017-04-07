@@ -36,10 +36,10 @@ try {
 
 				const config = {
 						appRoot: __dirname, // required config
-						// swaggerFile: 'api/swagger.yaml',
-						// controllersDir: 'src/controllers',
-						// mockControllersDir: 'src/mocks',
-						// helpers: 'src/helpers',
+						swaggerFile: __dirname + '/api/swagger.yaml',
+						controllersDir: __dirname + '/src/controllers',
+						mockControllersDir: __dirname + '/src/mocks',
+						helpers: __dirname + '/src/helpers',
 						controllers: __dirname + '/src/controllers',
 						useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
 				};
