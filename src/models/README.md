@@ -1,0 +1,1 @@
+Place models used by controllers in this directory.

@@ -6,7 +6,7 @@ info:
 host: localhost:10010
 tags:
   - name: Security
-    description: login and permissions, email verify
+    description: login and permissions, email verify, auth
   - name: User
     description: account management
 # basePath prefixes all resource paths
@@ -25,11 +25,11 @@ produces:
 paths:
   /user/register:
     # binds a127 app logic to a route
-    x-swagger-router-controller: register
+    x-swagger-router-controller: UserController
     post:
       description: add a 'user' object to data
       # used as the method name of the controller
-      operationId: addUser
+      operationId: register
       tags:
         - User
       parameters:
@@ -38,14 +38,55 @@ paths:
           description: a 'user' object
           required: true
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/RegisterUserObject"
       responses:
-        "200":
-          description: Success
+        "204":
+          description: User successfully created
           schema:
             # a pointer to a definition
-            $ref: "#/definitions/AddUserResponse"
+            $ref: "#/definitions/RegisterUserResponse"
         # responses may fall through to errors
+        "400":
+          description: Bad Request Error
+          schema:
+            $ref: "#/definitions/BadRequestError"
+        "404":
+          description: Not Found Error
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /auth:
+    x-swagger-router-controller: AuthController
+    post:
+      description: Authenticate a user based on his username and password
+      operationId: auth
+      tags:
+        - Security
+      parameters:
+        - name: authObject
+          in: body
+          description: an 'auth' object
+          required: true
+          schema:
+            $ref: "#/definitions/AuthObject"
+      responses:
+        "200":
+          description: User successfully logged in
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request Error
+          schema:
+            $ref: "#/definitions/BadRequestError"
+        "404":
+          description: Not Found Error
+          schema:
+            $ref: "#/definitions/NotFoundError"
         default:
           description: Error
           schema:
@@ -62,15 +103,68 @@ definitions:
         type: string
       password:
         type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
       role:
         type: string
-  AddUserResponse:
+  RegisterUserObject:
+    required:
+      - username
+      - password
+      - passwordConfirmation
+      - email
+      - firstname
+      - lastname
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      email:
+        type: string
+        format: email
+      firstname:
+        type: string
+      lastname:
+        type: string
+  AuthObject:
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+  SuccessResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  RegisterUserResponse:
     required:
       - message
     properties:
       message:
         type: string
   ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  BadRequestError:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  NotFoundError:
     required:
       - message
     properties:
