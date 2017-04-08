@@ -21,7 +21,9 @@
         "https"
     ],
     "consumes": [
-        "application/json"
+        "application/json",
+        "multipart/form-data",
+        "application/x-www-form-urlencoded"
     ],
     "produces": [
         "application/json"
