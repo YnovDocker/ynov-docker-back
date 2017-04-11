@@ -18,6 +18,7 @@
     "yaml-to-json": "^0.3.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "faker": "^4.1.0",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
@@ -26,12 +27,13 @@
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-contrib-uglify": "^2.3.0",
     "grunt-contrib-watch": "^1.0.0",
+    "mocha": "^3.2.0",
     "semver": "^5.3.0",
     "should": "^7.1.0",
     "supertest": "^1.0.0"
   },
   "scripts": {
     "start": "nodemon app.js -e js,yaml --ignore 'api/swagger/swagger.json'",
-    "test": "swagger project test"
+    "test": "mocha"
   }
 }
