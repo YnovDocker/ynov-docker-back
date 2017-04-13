@@ -35,7 +35,7 @@ paths:
       tags:
         - User
       parameters:
-        - name: userToAdd1
+        - name: userToAdd
           in: body
           description: a 'user' object
           required: true

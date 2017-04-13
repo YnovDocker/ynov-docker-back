@@ -7,7 +7,7 @@ module.exports = {
 				password: faker.random,
 				firstname: faker.name.findName(),
 				lastname: faker.name.findName(),
-				role: faker.random
+				admin: false
 		},
 		RegisterUserObject: {
 				username: "username",

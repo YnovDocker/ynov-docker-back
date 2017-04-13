@@ -5,15 +5,68 @@
 /*jshint esversion: 6 */
 
 'use strict';
+let util = require('util'),
+    mongoose = require('mongoose'),
+    logger = require('log4js').getLogger('controller.auth'),
+    _ = require('lodash'),
+    token = require('../helpers/token'),
+    UserDB = require('../models/User'),
+    User = mongoose.model('User');
 
 module.exports = {
 		auth: auth
 };
 
 function auth(req, res) {
+        logger.info('Authenticate user with login: '+ req.swagger.params.authObject.value.username);
 		// variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
 		// let name = req.swagger.params.userToAdd1.value;
 		// this sends back a JSON response which is a single string
-		res.set('Content-Type', 'application/json');
-		res.status(200).end(JSON.stringify({status: 200, message: "user authenticated !"} || {}));
+        let username = req.swagger.params.authObject.value.username;
+        let password = req.swagger.params.authObject.value.password;
+
+        User.getAuthenticated(username, password,
+            function (err, user, reason) {
+                if(err)
+                {
+                    logger.error(err);
+                    return next(err)
+                }
+
+                if(_.isNull(user) || _.isEmpty(user))
+                {
+                    res.set('Content-Type', 'application/json');
+                    res.status(401).json({
+                            error: {
+                                errorCode: 'E_INVALID_CREDENTIALS',
+                                errorMessage: 'Invalid username or password.'
+                            }
+                        } || {}, null, 2);
+                }
+                else
+                {
+                    logger.info('Creating user token for: ', user.username);
+                    //let tokenObject = token.createBasicToken(user._id, user.username, user.firstname, user.lastname);
+                    //token.setResponseToken(tokenObject, res);
+                    /*let authResponse = {
+                        userId: tokenObject.userId,
+                        username: tokenObject.username,
+                        firstname: tokenObject.firstname,
+                        lastname: tokenObject.lastname,
+                        expirationDate: tokenObject.expirationDate
+                    };*/
+                    //res.json(authResponse);
+                    // logger.info('authResponse object created: \n' + JSON.stringify(authResponse));
+                    // logger.info('user object created: \n' + user);
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).json({
+                            success: {
+                                successCode: 'USER_AUTH',
+                                successMessage: 'User authenticated',
+                                token: ''
+                            }
+                        }|| {}, null, 2);
+                }
+
+        })
 }

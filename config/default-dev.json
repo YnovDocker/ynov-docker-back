@@ -1,0 +1,20 @@
+{
+  "AppPaths": {
+    // relative to appRoot
+    "swaggerFile": "/api/swagger.yaml",
+    "controllersDir": "/src/controllers",
+    "mockControllersDir": "/src/mocks",
+    "helpers": "/src/helpers",
+    "controllers": "/src/controllers"
+  },
+  "server": {
+    "mongo": {
+      "connectionString": "mongodb://nanslaupretre.fr/ynovDockerDB",
+      "options": {
+        "server": {
+          "poolSize": 10
+        }
+      }
+    }
+  }
+}
