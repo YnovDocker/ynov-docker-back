@@ -13,8 +13,13 @@ let util = require('util'),
     User = mongoose.model('User');
 
 module.exports = {
-		register: register,
-		verifyEmail: verifyEmail
+        getUsers: getUsers,
+        getUserById: getUserById,
+        getUserByUsername: getUserByUsername,
+        register: register,
+        deleteUser: deleteUser,
+        updateUser: updateUser,
+        updatePassword: updatePassword
 };
 
 //Path: GET api/users
@@ -24,14 +29,17 @@ function getUsers(req, res, next) {
     //TODO add size param handling => see how to get the query params (using url package)
     // Code necessary to consume the User API and respond
     User.find({})
-        .populate('address')
+        //.populate('address')
         .exec(function (err, users) {
             if (err)
                 return next(err);
 
             if (_.isNull(users) || _.isEmpty(users)) {
                 res.set('Content-Type', 'application/json');
-                res.status(404).json({error: "Couldn't gets users"}, null, 2);
+                res.status(404).json({
+                    errorMessage: "Couldn't gets users",
+                    errorCode: "E_NO_USERS_FOUND"
+                }, null, 2);
             }
             else {
                 res.set('Content-Type', 'application/json');
@@ -40,89 +48,249 @@ function getUsers(req, res, next) {
         });
 };
 
+// Path: GET api/users/{userId}/getUserById
+function getUserById(req, res, next) {
+    logger.debug('BaseUrl:' + req.originalUrl);
+    logger.debug('Path:' + req.path);
+
+    logger.info('Getting the user with id:' + req.swagger.params.userId.value);
+
+    if(req.swagger.params.userId.value.length >= 12) {
+        // Code necessary to consume the User API and respond
+        User.findById(req.swagger.params.userId.value)
+            .exec(function (err, user) {
+                if (err)
+                    return next(err);
+                if (_.isNull(user) || _.isEmpty(user)) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(404).json({
+                        errorMessage: 'User not found',
+                        errorCode: 'E_USER_NOT_FOUND'
+                    } || {}, null, 2);
+                }
+                else {
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).end(JSON.stringify(user || {}, null, 2));
+                }
+            });
+    }
+    else
+    {
+        res.set('Content-Type', 'application/json');
+        res.status(404).json({
+                errorMessage: 'Not in objectId',
+                errorCode: 'E_NOT_ID'
+            } || {}, null, 2);
+    }
+};
+
+// Path: GET api/users/{username}/getUserByUsername
+function getUserByUsername(req, res, next) {
+    logger.debug('BaseUrl:' + req.originalUrl);
+    logger.debug('Path:' + req.path);
+
+    logger.info('Getting the user with username:' + req.swagger.params.username.value);
+    // Code necessary to consume the User API and respond
+
+    User.findOne({username: req.swagger.params.username.value})
+        .exec(function (err, user) {
+            if (err)
+                return next(err);
+
+            if (_.isNull(user) || _.isEmpty(user)) {
+                res.set('Content-Type', 'application/json');
+                res.status(404).json({
+                        errorMessage: 'User not found',
+                        errorCode: 'E_USER_NOT_FOUND'
+                    } || {}, null, 2);
+            }
+            else {
+                res.set('Content-Type', 'application/json');
+                res.status(200).end(JSON.stringify(user || {}, null, 2));
+            }
+        });
+};
+
+
 //Path: POST  /user/register
 function register(req, res, next) {
     logger.info('Adding new user...');
     //check if email isn't already taken
-    //UserService.alreadyTakenEmail(req, function (err, isAlreadyTakenEmail) {
-       //if (!isAlreadyTakenEmail) {
-            //TODO check password difficulty(later)
-            //TODO check phone number(later)
-        if(req.swagger.params.userToAdd.value.password === req.swagger.params.userToAdd.value.passwordConfirmation) {
-            let user = new User({
-                firstname: sanitizer.escape(req.swagger.params.userToAdd.value.firstname),
-                lastname: sanitizer.escape(req.swagger.params.userToAdd.value.lastname),
-                username: sanitizer.escape(req.swagger.params.userToAdd.value.username),
-                birthDate: sanitizer.escape(req.swagger.params.userToAdd.value.birthDate),
-                email: sanitizer.escape(req.swagger.params.userToAdd.value.email),
-                password: sanitizer.escape(req.swagger.params.userToAdd.value.password),
-                //address: [],
-                //phoneNumber: sanitizer.escape(req.body.phoneNumber),
-                //friends: []
-            });
+    User.alreadyTakenEmail(sanitizer.escape(req.swagger.params.userToAdd.value.email), function (err, isAlreadyTakenEmail) {
+        if (!isAlreadyTakenEmail) {
 
-            user.save(function (err, user) {
-                if (err) {
-                    logger.error("got an error while creating user: ", err);
-                    return next(err);
-                }
+            if(req.swagger.params.userToAdd.value.password === req.swagger.params.userToAdd.value.passwordConfirmation) {
+                let user = new User({
+                    firstname: sanitizer.escape(req.swagger.params.userToAdd.value.firstname),
+                    lastname: sanitizer.escape(req.swagger.params.userToAdd.value.lastname),
+                    username: sanitizer.escape(req.swagger.params.userToAdd.value.username),
+                    birthDate: sanitizer.escape(req.swagger.params.userToAdd.value.birthDate),
+                    email: sanitizer.escape(req.swagger.params.userToAdd.value.email),
+                    password: sanitizer.escape(req.swagger.params.userToAdd.value.password),
+                });
 
-                if (_.isNull(user) || _.isEmpty(user)) {
-                    res.set('Content-Type', 'application/json');
-                    res.status(404).json({error: 'Error while creating user'} || {}, null, 2);
-                }
-                //user saved, now sending email
-                else {
-                    //if email sendOnUserAdd activated in config, sending account validation email
-                    /*if (config.server.features.email.sendOnUserAdd) {
-                     var mailOpts = config.server.features.email.smtp.mailOpts;
+                user.save(function (err, user) {
+                    if (err) {
+                        logger.error("got an error while creating user: ", err);
+                        return next(err);
+                    }
 
-                     logger.debug("sendOnUserAdd config: " + JSON.stringify(mailOpts));
-                     logger.debug("sending email....");
+                    if (_.isNull(user) || _.isEmpty(user)) {
+                        res.set('Content-Type', 'application/json');
+                        res.status(404).json({error: 'Error while creating user'} || {}, null, 2);
+                    }
+                    //user saved, now sending email
+                    else {
+                        //TODO sendMailConfirmation
+                        //if email sendOnUserAdd activated in config, sending account validation email
+                        /*if (config.server.features.email.sendOnUserAdd) {
+                         var mailOpts = config.server.features.email.smtp.mailOpts;
 
-                     require('crypto').randomBytes(48, function (err, buffer) {
-                     var token = buffer.toString('hex');*/
+                         logger.debug("sendOnUserAdd config: " + JSON.stringify(mailOpts));
+                         logger.debug("sending email....");
 
-                    //send email
-                    /*emailUtils.dispatchAccountValidationLink(mailOpts, user, token, function (err, user) {
-                     if (err) {
-                     return next(err);
-                     }
-                     else {*/
-                    res.set('Content-Type', 'application/json');
-                    res.status(200).end(JSON.stringify(user || {}, null, 2));
-                    //}
-                    //});
-                    //});
-                }
-                /*else {//else returning user directly
-                 res.set('Content-Type', 'application/json');
-                 res.status(200).end(JSON.stringify(user || {}, null, 2));
-                 }*/
-                //}
-            });
-            //}
-            /*else {
-             res.set('Content-Type', 'application/json');
-             res.status(401).end(JSON.stringify({error: 'Email already used'} || {}, null, 2));
-             }*/
-            //});
+                         require('crypto').randomBytes(48, function (err, buffer) {
+                         var token = buffer.toString('hex');*/
+
+                        //send email
+                        /*emailUtils.dispatchAccountValidationLink(mailOpts, user, token, function (err, user) {
+                         if (err) {
+                         return next(err);
+                         }
+                         else {*/
+                        res.set('Content-Type', 'application/json');
+                        res.status(200).end(JSON.stringify(user || {}, null, 2));
+                        //}
+                        //});
+                        //});
+                    }
+                });
+            }
+            else
+            {
+                res.set('Content-Type', 'application/json');
+                res.status(400).json({
+                        errorMessage: 'password and confirmPassword is not equal',
+                        errorCode: 'E_PWD_NOT_EQUAL'
+                    } || {}, null, 2);
+            }
+
         }
-        else
-        {
+        else {
             res.set('Content-Type', 'application/json');
-            res.status(400).json({
-                    errorMessage: 'password and confirmPassword is not equal',
-                    errorCode: 'E_PWD_NOT_EQUAL'
-            } || {}, null, 2);
+            res.status(401).end(JSON.stringify({
+                    errorMessage: 'Email already used',
+                    errorCode: 'E_EMAIL_USED'
+            } || {}, null, 2));
         }
+    });
+
 };
 
-function verifyEmail(req, res) {
-		// variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-		// let username = req.swagger.params.userToAdd1;
-		// console.log("name: " + JSON.stringify(username));
-		// this sends back a JSON response which is a single string
-		res.set('Content-Type', 'application/json');
-		res.status(501).end(JSON.stringify({status: 501, message: "Not implemented yet"} || {}));
-}
+//TODO
+// Path: PUT api/users/{userId}/updateUser
+function updateUser(req, res, next) {
+    User.findOneAndUpdate(
+        {_id: req.swagger.params.userId.value},
+        {
+            $set: {
+                //TODO add phone number check
+                firstname: sanitizer.escape(req.swagger.params.userToUpdate.value.firstname),
+                lastname: sanitizer.escape(req.swagger.params.userToUpdate.value.lastname),
+                username: sanitizer.escape(req.swagger.params.userToUpdate.value.username),
+                birthDate: sanitizer.escape(req.swagger.params.userToUpdate.value.birthDate),
+                email: sanitizer.escape(req.swagger.params.userToUpdate.value.email),
+                updated_at: Date.now()
+            }
+        },
+        {new: true}, //means we want the DB to return the updated document instead of the old one
+        function (err, updatedUser) {
+            if (err)
+                return next(err);
+            else {
+                logger.debug("Updated game object: \n" + updatedUser);
+                res.set('Content-Type', 'application/json');
+                res.status(200).end(JSON.stringify(updatedUser || {}, null, 2));
+            }
+        });
+};
+
+// Path : PUT /users/{userId}/updatePassword
+function updatePassword(req, res, next) {
+    logger.info('Updating password for user with id:\n ' + req.swagger.params.userId.value);
+
+    let userOldPassword = req.swagger.params.changePwdObject.value.oldPassword;
+    let newPassword = req.swagger.params.changePwdObject.value.newPassword;
+    let newPasswordConfirmation = req.swagger.params.changePwdObject.value.confirmNewPassword;
+    logger.debug('userPassword object:' + userOldPassword);
+    logger.debug('newPassword object:' + newPassword);
+
+    User.findById(
+        req.swagger.params.userId.value,
+        function (err, user) {
+            if (err)
+                return next(err);
+
+            // test for a matching password
+            user.comparePassword(userOldPassword, function (err, isMatch) {
+                if (err) return next(err);
+
+                // check if the password was a match
+                if (isMatch) {
+                    //logger.debug('It\'s a match !');
+                    if (newPassword === newPasswordConfirmation) {
+                        user.saltPassword(newPassword, function (err, saltedNewPassword) {
+                            logger.debug('saltedNewPassword:' + saltedNewPassword);
+                            user.update({
+                                $set: {password: saltedNewPassword}
+                            }, function (err, raw) {
+                                if (err) return next(err);
+                                res.set('Content-Type', 'application/json');
+                                res.status(200).end(JSON.stringify({
+                                    successMessage: 'password successfully modified',
+                                    successCode: 'PWD_UPDATED'
+                                } || {}, null, 2));
+                            });
+                        });
+                    }
+                    else {
+                        res.set('Content-Type', 'application/json');
+                        res.status(401).end(JSON.stringify({
+                            errorMessage: 'New passwords aren\'t the same',
+                            errorCode: 'E_NEW_PWD_NOT_EQUAL'
+                        }, null, 2));
+                    }
+                }
+                else {//no match
+                    res.set('Content-Type', 'application/json');
+                    res.status(401).end(JSON.stringify({
+                        errorMessage: 'Bad old password',
+                        errorCode: 'E_BAD_OLD_PWD'
+                    }, null, 2));
+                }
+            });
+        });
+};
+
+// Path : PUT api/users/{userId}/deleteUser
+function deleteUser(req, res, next) {
+    logger.info('Deactivating for user with id:\n ' + req.swagger.params.userId.value);
+    User.findOneAndUpdate(
+        {_id: req.swagger.params.userId.value},
+        {
+            $set: {
+                active: false
+            }
+        },
+        {new: true}, //means we want the DB to return the updated document instead of the old one
+        function (err, updatedUser) {
+            if (err) {
+                return next(err);
+            }
+            else {
+                logger.debug("Deactivated game object: \n" + updatedUser);
+                res.set('Content-Type', 'application/json');
+                res.status(200).end(JSON.stringify(updatedUser || {}, null, 2));
+            }
+        });
+};

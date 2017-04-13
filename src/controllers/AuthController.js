@@ -17,7 +17,7 @@ module.exports = {
 		auth: auth
 };
 
-function auth(req, res) {
+function auth(req, res, next) {
         logger.info('Authenticate user with login: '+ req.swagger.params.authObject.value.username);
 		// variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
 		// let name = req.swagger.params.userToAdd1.value;

@@ -29,6 +29,181 @@
         "application/json"
     ],
     "paths": {
+        "/user/getUsers": {
+            "x-swagger-router-controller": "UserController",
+            "get": {
+                "description": "get all 'user' object",
+                "operationId": "getUsers",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get an array of 'user' object",
+                        "schema": {
+                            "title": "UsersArray",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{userId}/getUserById": {
+            "x-swagger-router-controller": "UserController",
+            "get": {
+                "description": "get an 'user' object",
+                "operationId": "getUserById",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'user' object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{username}/getUserByUsername": {
+            "x-swagger-router-controller": "UserController",
+            "get": {
+                "description": "get an 'user' object",
+                "operationId": "getUserByUsername",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "username of an user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'user' object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{userId}/deleteUser": {
+            "x-swagger-router-controller": "UserController",
+            "put": {
+                "description": "deactivate an 'user' object",
+                "operationId": "deleteUser",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'user' object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{userId}/updatePassword": {
+            "x-swagger-router-controller": "UserController",
+            "put": {
+                "description": "update an 'user' password",
+                "operationId": "updatePassword",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "changePwdObject",
+                        "in": "body",
+                        "description": "an object to change pwd",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ChangePasswordObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'user' object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{userId}/updateUser": {
+            "x-swagger-router-controller": "UserController",
+            "put": {
+                "description": "update an 'user' password",
+                "operationId": "updateUser",
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "userToUpdate",
+                        "in": "body",
+                        "description": "an 'user' object to change",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdateUserObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'user' object",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                }
+            }
+        },
         "/user/register": {
             "x-swagger-router-controller": "UserController",
             "post": {
@@ -145,8 +320,9 @@
                 "lastname": {
                     "type": "string"
                 },
-                "role": {
-                    "type": "string"
+                "birthDate": {
+                    "type": "string",
+                    "format": "date"
                 }
             }
         },
@@ -157,7 +333,8 @@
                 "passwordConfirmation",
                 "email",
                 "firstname",
-                "lastname"
+                "lastname",
+                "birthDate"
             ],
             "properties": {
                 "username": {
@@ -168,6 +345,38 @@
                 },
                 "passwordConfirmation": {
                     "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "birthDate": {
+                    "type": "string",
+                    "format": "date"
+                }
+            }
+        },
+        "UpdateUserObject": {
+            "required": [
+                "username",
+                "email",
+                "firstname",
+                "lastname",
+                "birthDate"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "birthDate": {
+                    "type": "string",
+                    "format": "date"
                 },
                 "email": {
                     "type": "string",
@@ -191,6 +400,24 @@
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "ChangePasswordObject": {
+            "required": [
+                "oldPassword",
+                "newPassword",
+                "confirmNewPassword"
+            ],
+            "properties": {
+                "oldPassword": {
+                    "type": "string"
+                },
+                "newPassword": {
+                    "type": "string"
+                },
+                "confirmNewPassword": {
                     "type": "string"
                 }
             }

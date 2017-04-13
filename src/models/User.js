@@ -6,6 +6,7 @@ let bcrypt = require('bcryptjs');
 let Schema = mongoose.Schema;
 let logger = require('log4js').getLogger('Users');
 let _ = require('lodash');
+let sanitizer = require('sanitizer');
 
 let User = new Schema({
     firstname: {type: String, required: false},
@@ -24,11 +25,11 @@ let User = new Schema({
     updated_at: {type: Date, required: true, default: new Date()},
     verified: {type: Boolean, required: true, default: false},
     loginAttempts: {type: Number, required: true, default: 0},
-    lockUntil: {type: Number},
-    accVerifyToken: {type: String, required: false},
-    accVerifyTokenExpires: {type: Date, required: false},
-    accRegisterToken: {type: String, required: false},
-    accRegisterTokenExpires: {type: Date, required: false}
+    //lockUntil: {type: Number},
+    //accVerifyToken: {type: String, required: false},
+    //accVerifyTokenExpires: {type: Date, required: false},
+    //accRegisterToken: {type: String, required: false},
+    //accRegisterTokenExpires: {type: Date, required: false}
 });
 
 User.virtual('isLocked').get(function () {
@@ -159,7 +160,7 @@ User.statics.getAuthenticated = function (username, password, cb) {
                 // reset attempts and lock info
                 let updates = {
                     $set: {loginAttempts: 0},
-                    $unset: {lockUntil: 1}
+                    //$unset: {lockUntil: 1}
                 };
                 return user.update(updates, function (err) {
                     if (err) return cb(err);
@@ -174,6 +175,20 @@ User.statics.getAuthenticated = function (username, password, cb) {
             });
         });
     });
+};
+
+User.statics.alreadyTakenEmail = function alreadyTakenEmail(emailToVerify, next) {
+    this.findOne({email: emailToVerify},
+        function (err, user) {
+            if (err)
+                return next(err, null);
+            if (_.isNull(user) || _.isEmpty(user)) {
+                return next(null, false);
+            }
+            else {
+                return next(null, true);
+            }
+        });
 };
 
 User.pre('update', function (next) {
