@@ -19,9 +19,7 @@ module.exports = {
 
 function auth(req, res, next) {
         logger.info('Authenticate user with login: '+ req.swagger.params.authObject.value.username);
-		// variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-		// let name = req.swagger.params.userToAdd1.value;
-		// this sends back a JSON response which is a single string
+
         let username = req.swagger.params.authObject.value.username;
         let password = req.swagger.params.authObject.value.password;
 
@@ -46,27 +44,48 @@ function auth(req, res, next) {
                 else
                 {
                     logger.info('Creating user token for: ', user.username);
-                    //let tokenObject = token.createBasicToken(user._id, user.username, user.firstname, user.lastname);
-                    //token.setResponseToken(tokenObject, res);
-                    /*let authResponse = {
-                        userId: tokenObject.userId,
-                        username: tokenObject.username,
-                        firstname: tokenObject.firstname,
-                        lastname: tokenObject.lastname,
-                        expirationDate: tokenObject.expirationDate
-                    };*/
-                    //res.json(authResponse);
-                    // logger.info('authResponse object created: \n' + JSON.stringify(authResponse));
-                    // logger.info('user object created: \n' + user);
-                    res.set('Content-Type', 'application/json');
-                    res.status(200).json({
-                            success: {
-                                successCode: 'USER_AUTH',
-                                successMessage: 'User authenticated',
-                                token: ''
-                            }
-                        }|| {}, null, 2);
+                    let tokenObject = token.createBasicToken(user._id, user.username, user.firstname, user.lastname);
+                    token.setResponseToken(tokenObject, res,
+                        function(tokenCrypted) {
+                            let authResponse = {
+                                userId: tokenObject.userId,
+                                username: tokenObject.username,
+                                firstname: tokenObject.firstname,
+                                lastname: tokenObject.lastname,
+                                expirationDate: tokenObject.expirationDate
+                            };
+                            logger.info('token: '+ JSON.stringify(tokenObject));
+                            //res.json(authResponse);
+                            // logger.info('authResponse object created: \n' + JSON.stringify(authResponse));
+                            // logger.info('user object created: \n' + user);
+                            User.findOneAndUpdate(
+                                {_id: authResponse.userId},
+                                {
+                                    $set: {
+                                        connectionToken: tokenCrypted,
+                                    }
+                                },
+                                {new: true}, //means we want the DB to return the updated document instead of the old one
+                                function (err, updatedUser) {
+                                    if (err)
+                                        return next(err);
+                                    else {
+                                        res.set('Content-Type', 'application/json');
+                                        res.status(200).json({
+                                                success: {
+                                                    successCode: 'USER_AUTH',
+                                                    successMessage: 'User authenticated',
+                                                    tokenObject: authResponse,
+                                                    token: tokenCrypted
+                                                }
+                                            }|| {}, null, 2);
+                                    }
+                                });
+
+
+                        });
                 }
 
         })
 }
+

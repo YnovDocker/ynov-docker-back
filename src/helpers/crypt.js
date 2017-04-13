@@ -1,7 +1,7 @@
 /**
  * Created by Antoine on 02/03/2016.
  */
-/*var crypto = require('crypto');
+var crypto = require('crypto');
 var logger = require('log4js').getLogger('service.security.crypt');
 
 var algorithm = 'aes-256-ctr';
@@ -23,4 +23,4 @@ module.exports.decrypt = function decrypt(text) {
     dec += decipher.final(format);
     logger.debug('Deciphered: ' + dec);
     return dec;
-};*/
+};

@@ -37,6 +37,15 @@
                 "tags": [
                     "User"
                 ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "get an array of 'user' object",
@@ -60,6 +69,13 @@
                     "User"
                 ],
                 "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
                     {
                         "name": "userId",
                         "in": "path",
@@ -88,6 +104,13 @@
                 ],
                 "parameters": [
                     {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "name": "username",
                         "in": "path",
                         "description": "username of an user",
@@ -115,6 +138,13 @@
                 ],
                 "parameters": [
                     {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "name": "userId",
                         "in": "path",
                         "description": "a id of an user",
@@ -141,6 +171,13 @@
                     "User"
                 ],
                 "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
                     {
                         "name": "userId",
                         "in": "path",
@@ -177,6 +214,13 @@
                     "User"
                 ],
                 "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
                     {
                         "name": "userId",
                         "in": "path",

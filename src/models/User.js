@@ -25,6 +25,7 @@ let User = new Schema({
     updated_at: {type: Date, required: true, default: new Date()},
     verified: {type: Boolean, required: true, default: false},
     loginAttempts: {type: Number, required: true, default: 0},
+    connectionToken: {type: String, required: false}
     //lockUntil: {type: Number},
     //accVerifyToken: {type: String, required: false},
     //accVerifyTokenExpires: {type: Date, required: false},

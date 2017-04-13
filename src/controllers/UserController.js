@@ -25,7 +25,6 @@ module.exports = {
 //Path: GET api/users
 function getUsers(req, res, next) {
     logger.info('Getting all users from db...');
-
     //TODO add size param handling => see how to get the query params (using url package)
     // Code necessary to consume the User API and respond
     User.find({})
