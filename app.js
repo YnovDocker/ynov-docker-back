@@ -37,12 +37,12 @@ try {
 				}
                 logger.info('swagger.json write for /docs');
 
-				//initialize swagger.json
-				let swaggerDoc = require(swaggerSpecFilePath);
-				swaggerDoc.host = 'localhost' + ':' + port;
+        //initialize swagger.json
+        let swaggerDoc = require(swaggerSpecFilePath);
+        swaggerDoc.host = 'localhost' + ':' + port;
 
 
-				module.exports = app; // for testing
+        module.exports = app; // for testing
 
 				const swaggerConfig = {
 						appRoot: __dirname, // required config
@@ -107,14 +107,14 @@ try {
                     // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
 						app.use(middleware.swaggerMetadata());
 
-						// Validate Swagger requests
-						app.use(middleware.swaggerValidator());
+            // Validate Swagger requests
+            app.use(middleware.swaggerValidator());
 
 						// Route validated requests to appropriate controller
 						app.use(middleware.swaggerRouter(swaggerConfig));
 
-						// Serve the Swagger documents and Swagger UI
-						app.use(middleware.swaggerUi());
+            // Serve the Swagger documents and Swagger UI
+            app.use(middleware.swaggerUi());
 
 						// Start the server
 						swaggerExpress.create(swaggerConfig, function (err, swaggerExpress) {
@@ -122,8 +122,8 @@ try {
 										throw err;
 								}
 
-								// install middleware
-								swaggerExpress.register(app);
+                // install middleware
+                swaggerExpress.register(app);
 
 								app.listen(port);
                                 logger.info('Your server is listening on port %d (http://localhost:%d)', port, port);
@@ -131,7 +131,7 @@ try {
 				});
 		});
 } catch (e) {
-		console.log(e);
+    console.log(e);
 }
 
 

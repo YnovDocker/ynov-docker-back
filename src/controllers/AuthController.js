@@ -14,7 +14,7 @@ let util = require('util'),
     User = mongoose.model('User');
 
 module.exports = {
-		auth: auth
+    auth: auth
 };
 
 function auth(req, res, next) {
