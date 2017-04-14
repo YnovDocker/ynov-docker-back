@@ -1,6 +1,6 @@
 # Skeleton project for Swagger
 
-###Dev environment
+### Dev environment
 Run environment :
 ```bash
 npm install
@@ -15,7 +15,7 @@ http://localhost:10010/docs
 For documentation and tests, in the CLI : swagger project edit
 For edit swagger.yaml
 
-###Prod environment
+### Prod environment
 On your server with docker installed, pull/update lnans/ynov-docker-back and lnans/ynov-docker-mongo
 ```bash
 docker pull lnans/ynov-docker-back
