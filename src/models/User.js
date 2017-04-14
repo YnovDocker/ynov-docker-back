@@ -1,12 +1,12 @@
 /**
  * Created by Antoine on 08/04/2017.
  */
-let mongoose = require('mongoose');
-let bcrypt = require('bcryptjs');
-let Schema = mongoose.Schema;
-let logger = require('log4js').getLogger('Users');
-let _ = require('lodash');
-let sanitizer = require('sanitizer');
+let mongoose = require('mongoose'),
+    bcrypt = require('bcryptjs'),
+    Schema = mongoose.Schema,
+    logger = require('log4js').getLogger('Users'),
+    _ = require('lodash'),
+    sanitizer = require('sanitizer');
 
 let User = new Schema({
     firstname: {type: String, required: false},

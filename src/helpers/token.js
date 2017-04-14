@@ -2,7 +2,7 @@
  * Created by Antoine on 02/03/2016.
  */
 
-var log4js = require('log4js'),
+let log4js = require('log4js'),
     logger = log4js.getLogger('service.security.token'),
     config = require('config'),
     moment = require('moment'),
@@ -12,7 +12,7 @@ var log4js = require('log4js'),
     UserDB = require('../models/User'),
     User = mongoose.model('User');
 
-var TOKEN_HEADER_NAME = 'x-access-token';
+let TOKEN_HEADER_NAME = 'x-access-token';
 
 function Token(options) {
     this.userId = options.userId;
@@ -22,11 +22,11 @@ function Token(options) {
     this.lastname = options.lastname;
 }
 
-var tokenDuration;
+let tokenDuration;
 
 module.exports.initialize = function initialize() {
-    var configTokenDuration = config.server.auth.tokenDuration;
-    var isConfigValid = !!configTokenDuration;
+    let configTokenDuration = config.server.auth.tokenDuration;
+    let isConfigValid = !!configTokenDuration;
 
     if (isConfigValid) {
         try {
@@ -47,7 +47,7 @@ module.exports.initialize = function initialize() {
 
 module.exports.createBasicToken = function createBasicToken(userId, username, firstname, lastname) {
     logger.info('Creating new token with basic information');
-    var tkn = {
+    let tkn = {
         userId: userId,
         expirationDate: '',
         username: username,
@@ -55,7 +55,7 @@ module.exports.createBasicToken = function createBasicToken(userId, username, fi
         lastname: lastname
     };
 
-    var token = new Token(tkn);
+    let token = new Token(tkn);
     logger.info('Created token: ' + JSON.stringify(token));
     renewToken(token);
 
@@ -69,7 +69,6 @@ module.exports.tokenHandler = function tokenHandler(req, res, next) {
     for(let i = 0; i<config.publicPath.length; i ++)
     {
         //logger.debug(config.publicPath[i]);
-
         if(config.publicPath[i] === req.originalUrl)
         {
             publicPath = true;
@@ -98,7 +97,7 @@ module.exports.tokenHandler = function tokenHandler(req, res, next) {
                 let decryptedTokenString = crypt.decrypt(tokenString);
 
 
-                var token;
+                let token;
                 try {
                     token = JSON.parse(decryptedTokenString);
                 } catch (e) {
@@ -157,7 +156,7 @@ function verifyToken(userId, tokenString, res, next) {
 }
 
 function isTokenExpired(token) {
-    var expirationDate = moment(token.expirationDate);
+    let expirationDate = moment(token.expirationDate);
     if (!expirationDate.isValid()) {
         logger.debug('Expiration date is invalid: ' + token.expirationDate);
         return true;
@@ -180,13 +179,14 @@ module.exports.setResponseToken = function setResponseToken(token, res, cb) {
 };
 
 function renewToken(token) {
-    var newExpirationDate = moment().add(tokenDuration).toISOString();
+    let newExpirationDate = moment().add(tokenDuration).toISOString();
     logger.debug('Setting new expiration date to: ' + newExpirationDate);
     token.expirationDate = newExpirationDate;
 }
 
 module.exports.getToken = function getToken(req, cb) {
+    let tokenGet = req.query.token || req.header(TOKEN_HEADER_NAME);
     //on set le token soit dans la query soit dans les headers
-    logger.info('get Token: '+ req.query.token || req.header('x-access-token'));
-    cb(req.query.token || req.header('x-access-token'));
+    logger.info('get Token: '+ tokenGet);
+    cb(tokenGet);
 };
