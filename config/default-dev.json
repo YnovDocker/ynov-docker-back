@@ -7,6 +7,11 @@
     "helpers": "/src/helpers",
     "controllers": "/src/controllers"
   },
+  "publicPath": [
+    "/api/user/register",
+    "/api/auth",
+    "/api-docs"
+    ],
   "server": {
     "mongo": {
       "connectionString": "mongodb://nanslaupretre.fr/ynovDockerDB",
@@ -14,6 +19,12 @@
         "server": {
           "poolSize": 10
         }
+      }
+    },
+    "auth": {
+      "tokenDuration": {
+        "unit": "hours",
+        "value": 5
       }
     }
   }

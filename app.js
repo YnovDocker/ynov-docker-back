@@ -14,7 +14,8 @@ const swaggerExpress = require('swagger-express-mw'),
 
 mongoose.Promise = Promise;
 
-let logger = log4js.getLogger('server.core');
+let logger = log4js.getLogger('server.core'),
+    token = require('./src/helpers/token');
 
 //config variable
 const swaggerSpecFilePath = __dirname + '/api/swagger.json';
@@ -103,6 +104,10 @@ try {
                             process.exit(0);
                         });
                     });
+
+                    logger.info('Using token handler middleware');
+                    token.initialize();
+                    app.use(token.tokenHandler);
 
                     // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
 						app.use(middleware.swaggerMetadata());

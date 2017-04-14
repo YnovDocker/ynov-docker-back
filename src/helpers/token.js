@@ -2,14 +2,17 @@
  * Created by Antoine on 02/03/2016.
  */
 
-/*var log4js = require('log4js'),
+var log4js = require('log4js'),
     logger = log4js.getLogger('service.security.token'),
     config = require('config'),
     moment = require('moment'),
     crypt = require('./crypt'),
-    express = require('express');
+    express = require('express'),
+    mongoose = require('mongoose'),
+    UserDB = require('../models/User'),
+    User = mongoose.model('User');
 
-var TOKEN_HEADER_NAME = 'token';
+var TOKEN_HEADER_NAME = 'x-access-token';
 
 function Token(options) {
     this.userId = options.userId;
@@ -60,59 +63,73 @@ module.exports.createBasicToken = function createBasicToken(userId, username, fi
 };
 
 module.exports.tokenHandler = function tokenHandler(req, res, next) {
-    logger.debug('Handling token: ' + req.query.token + ' or ' + req.header(TOKEN_HEADER_NAME));
-    var tokenString = req.header(TOKEN_HEADER_NAME) || req.query.token;
+    logger.debug('Handling token');
+    let publicPath = false;
+    //check the publicPath
+    for(let i = 0; i<config.publicPath.length; i ++)
+    {
+        //logger.debug(config.publicPath[i]);
 
-    logger.debug('String token: ' + tokenString);
-    logger.debug('Original url: ' + req.originalUrl);
-
-    if (!tokenString) {
-        logger.debug('Missing token in request');
-        // let those URLs pass without token
-        // /api-docs : swagger spec file (JSON)
-        // /docs : swagger UI
-        if (req.originalUrl === '/api/auth' || req.originalUrl === '/api/user/verify/' || (req.originalUrl.lastIndexOf('/api-docs', 0) >= 0) || (req.originalUrl.lastIndexOf('/docs', 0) >= 0)) {
-            logger.debug('Authorized url w/o token');
-            next();
-        } else {
-            logger.debug('Missing token in request');
-            res.status(401).json({err: 'Missing token'});
+        if(config.publicPath[i] === req.originalUrl)
+        {
+            publicPath = true;
         }
-        return;
     }
+    //exception for /docs of swagger
+    if(req.originalUrl.lastIndexOf('/docs', 0) >= 0)
+        publicPath = true;
 
-    let decryptedTokenString = crypt.decrypt(tokenString);
-
-    var token;
-    try {
-        token = JSON.parse(decryptedTokenString);
-    } catch (e) {
-        logger.warn('Failed to parse token', e);
+    if (publicPath) {
+        logger.debug('Authorized url w/o token');
+        next();
     }
+    else {
+        exports.getToken(req, function (reqToken) {
+            let tokenString = reqToken;
 
-    if (!token) {
-        logger.warn('Failed to parse token');
-        res.status(401).json({err: 'Invalid token'});
-        return;
+            //logger.debug('String token: ' + tokenString);
+            //logger.debug('Original url: ' + req.originalUrl);
+
+            if (!tokenString) {
+                logger.debug('Missing token in request');
+                res.status(401).json({err: 'Missing token'});
+            }
+            else {
+                let decryptedTokenString = crypt.decrypt(tokenString);
+
+
+                var token;
+                try {
+                    token = JSON.parse(decryptedTokenString);
+                } catch (e) {
+                    logger.warn('Failed to parse token', e);
+                }
+
+                if (!token) {
+                    logger.warn('Failed to parse token');
+                    res.status(401).json({err: 'Invalid token'});
+                    return;
+                }
+
+                if (isTokenExpired(token)) {
+                    logger.info('Token is expired');
+                    res.status(401).json({err: 'Expired token'});
+                    return;
+                }
+
+                logger.debug('Request token: ', token);
+
+                if (!isTokenValid(token, res)) {
+                    res.status(401).end();
+                }
+
+                renewToken(token);
+                exports.setResponseToken(token, res, function (tokenCrypted) {
+                    next();
+                });
+            }
+        });
     }
-
-    if (isTokenExpired(token)) {
-        logger.info('Token is expired');
-        res.status(401).json({err: 'Expired token'});
-        return;
-    }
-
-    logger.debug('Request token: ', token);
-
-    if (!isTokenValid(token, res)) {
-        res.status(401).end();
-    }
-
-    renewToken(token);
-    req.token = token;
-    exports.setResponseToken(token, res);
-
-    next();
 };
 
 function isTokenValid(token) {
@@ -121,6 +138,22 @@ function isTokenValid(token) {
 
     //verify token
     return token.hasOwnProperty('userId', 'expirationDate', 'username', 'lastname', 'firstname');
+}
+
+function verifyToken(userId, tokenString, res, next) {
+    User.findById(userId)
+        .exec(function (err, user) {
+            if(err) {
+                logger.error(err);
+                next();
+            }
+            else {
+                if(user.connectionToken === tokenString)
+                    return true;
+                else
+                    return false;
+            }
+        })
 }
 
 function isTokenExpired(token) {
@@ -138,10 +171,12 @@ function isTokenExpired(token) {
     return false;
 }
 
-module.exports.setResponseToken = function setResponseToken(token, res) {
-    var tokenString = JSON.stringify(token);
+module.exports.setResponseToken = function setResponseToken(token, res, cb) {
+    let tokenString = JSON.stringify(token);
+    let tokenCrypted = crypt.encrypt(tokenString);
 
-    res.set(TOKEN_HEADER_NAME, crypt.encrypt(tokenString));
+    //res.set(TOKEN_HEADER_NAME, tokenCrypted);
+    cb(tokenCrypted);
 };
 
 function renewToken(token) {
@@ -150,6 +185,8 @@ function renewToken(token) {
     token.expirationDate = newExpirationDate;
 }
 
-module.exports.getToken = function getToken(req) {
-    return req.token;
-};*/
+module.exports.getToken = function getToken(req, cb) {
+    //on set le token soit dans la query soit dans les headers
+    logger.info('get Token: '+ req.query.token || req.header('x-access-token'));
+    cb(req.query.token || req.header('x-access-token'));
+};
