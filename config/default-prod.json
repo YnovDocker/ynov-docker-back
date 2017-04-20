@@ -25,7 +25,7 @@
         }
       }
     },
-    "host": "localhost",
+    "host": "nanslaupretre.fr",
     "auth": {
       "tokenDuration": {
         "unit": "hours",

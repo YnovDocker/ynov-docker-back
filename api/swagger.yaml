@@ -9,6 +9,8 @@ tags:
     description: login and permissions, email verify, auth
   - name: User
     description: account management
+  - name: File
+    description: file management
 # basePath prefixes all resource paths
 basePath: /api
 #
@@ -25,6 +27,39 @@ consumes:
 produces:
   - application/json
 paths:
+  /auth:
+    x-swagger-router-controller: AuthController
+    post:
+      description: Authenticate a user based on his username and password
+      operationId: auth
+      tags:
+        - Security
+      parameters:
+        - name: authObject
+          in: body
+          description: an 'auth' object
+          required: true
+          schema:
+            $ref: "#/definitions/AuthObject"
+      responses:
+        "200":
+          description: User successfully logged in
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request Error
+          schema:
+            $ref: "#/definitions/BadRequestError"
+        "404":
+          description: Not Found Error
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /user/getUsers:
     x-swagger-router-controller: UserController
     get:
@@ -208,26 +243,46 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /auth:
-    x-swagger-router-controller: AuthController
+  /file:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: FileController
     post:
-      description: Authenticate a user based on his username and password
-      operationId: auth
+      description: add a 'file' object to data
+      # used as the method name of the controller
+      operationId: addFile
       tags:
-        - Security
-      parameters:
-        - name: authObject
-          in: body
-          description: an 'auth' object
-          required: true
-          schema:
-            $ref: "#/definitions/AuthObject"
+        - File
       responses:
         "200":
           description: User successfully logged in
           schema:
             # a pointer to a definition
             $ref: "#/definitions/SuccessResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request Error
+          schema:
+            $ref: "#/definitions/BadRequestError"
+        "404":
+          description: Not Found Error
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: get a 'file' object to data
+      # used as the method name of the controller
+      operationId: getFile
+      tags:
+        - File
+      responses:
+        "200":
+          description: User successfully logged in
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/File"
         # responses may fall through to errors
         "400":
           description: Bad Request Error
@@ -260,6 +315,20 @@ definitions:
       birthDate:
         type: string
         format: date
+  File:
+    properties:
+      fileName:
+        type: string
+      fileSize:
+        type: number
+      fileExt:
+        type: string
+      fileType:
+        type: string
+      privateLink:
+        type: string
+      publicLink:
+        type: string
   RegisterUserObject:
     required:
       - username
@@ -327,17 +396,38 @@ definitions:
         type: string
       confirmNewPassword:
         type: string
+  AddFileObject:
+    required:
+      - fileName
+      - fileType
+    properties:
+      fileName:
+        type: string
+      fileType:
+        type: string
   SuccessResponse:
     required:
-      - message
+      - successMessage
+      - successCode
     properties:
-      message:
+      successMessage:
+        type: string
+      successCode:
         type: string
   RegisterUserResponse:
     required:
       - message
     properties:
       message:
+        type: string
+  FileResponse:
+    required:
+      - successMessage
+      - successCode
+    properties:
+      successMessage:
+        type: string
+      successCode:
         type: string
   ErrorResponse:
     required:
