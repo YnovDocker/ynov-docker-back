@@ -1,11 +1,15 @@
 /**
  * Created by tdoret on 14/04/2017.
  */
+/* jshint node: true */
+/*jshint esversion: 6 */
+
 'use strict';
+
 let util = require('util'),
     mongoose = require('mongoose'),
     logger = require('log4js').getLogger('controller.file'),
-    config= require('config'),
+    config = require('config'),
     _ = require('lodash'),
     sanitizer = require('sanitizer'),
     FileDB = require('../models/File'),
@@ -21,21 +25,19 @@ module.exports = {
     getFile: getFile
 };
 
-function addFile(req,res,next) {
+function addFile(req, res, next) {
     // setHeadersFile(res, function(res) {
-        upload(req, res, function (err) {
-            if (err) {
-                return res.end(err.toString());
-            }
-            res.set('Content-Type', 'application/json');
-            res.status(200).end(JSON.stringify({
-                    successMessage: 'File is uploaded',
-                    successCode: 'OK'
-                } || {}, null, 2));
-        });
+    upload(req, res, function (err) {
+        if (err) {
+            return res.end(err.toString());
+        }
+        res.set('Content-Type', 'application/json');
+        res.status(200).end(JSON.stringify({
+                successMessage: 'File is uploaded',
+                successCode: 'OK'
+            } || {}, null, 2));
+    });
     // });
-
-
 
 
     //let userId = req.swagger.params.userId.value;
@@ -44,31 +46,29 @@ function addFile(req,res,next) {
     // let fileExt;
 
 
-
     //logger.debug('filename: '+ fileNameToUpload);
     //logger.debug('fileType: '+ req.swagger.params.fileToAdd.value.fileType);
 
 
-
     /*let file = new File({
-        filename : fileNameToUpload,
-        filesize: fileSize,
-        fileExt: fileExt,
-        fileType: req.swagger.params.fileToAdd.value.fileType,
-        publicLink: config.fileRepository.publicPath + '/' + userId + '/' + fileNameToUpload,
-        privateLink: config.fileRepository.privatePath + '/' + userId + '/' + fileNameToUpload
-    })*/
+     filename : fileNameToUpload,
+     filesize: fileSize,
+     fileExt: fileExt,
+     fileType: req.swagger.params.fileToAdd.value.fileType,
+     publicLink: config.fileRepository.publicPath + '/' + userId + '/' + fileNameToUpload,
+     privateLink: config.fileRepository.privatePath + '/' + userId + '/' + fileNameToUpload
+     })*/
 
 }
 
 function getFile(req, res, next) {
 
     // setHeadersFile(res,function(res) {
-        res.set('Content-Type', 'application/json');
-        res.status(200).end(JSON.stringify({
-                successMessage: 'file catcher example',
-                successCode: 'OK'
-            } || {}, null, 2));
+    res.set('Content-Type', 'application/json');
+    res.status(200).end(JSON.stringify({
+            successMessage: 'file catcher example',
+            successCode: 'OK'
+        } || {}, null, 2));
     // });
 }
 
