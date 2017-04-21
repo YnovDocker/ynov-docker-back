@@ -24,7 +24,7 @@ const swaggerSpecFilePath = __dirname + '/api/swagger.json';
 const port = process.env.PORT || 10010;
 
 function allowCORS(req, res, next) {
-    res.set("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Credentials", true);
     res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
     res.set("Access-Control-Expose-Headers", "Content-Type, token");
