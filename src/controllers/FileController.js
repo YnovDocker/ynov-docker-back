@@ -10,10 +10,11 @@ let util = require('util'),
     sanitizer = require('sanitizer'),
     FileDB = require('../models/File'),
     File = mongoose.model('File'),
-    multer = require('multer');
+    multer = require('multer'),
+    fs = require('fs');
 
 const DIR = config.fileRepository.privatePath;
-let upload = multer({dest: DIR}).single();
+let upload = multer({dest: DIR}).single('uploadFile');
 
 
 module.exports = {
@@ -21,19 +22,20 @@ module.exports = {
     getFile: getFile
 };
 
-function addFile(req,res,next) {
-    // setHeadersFile(res, function(res) {
+function addFile(req,res) {
+
+
         upload(req, res, function (err) {
             if (err) {
                 return res.end(err.toString());
             }
+
             res.set('Content-Type', 'application/json');
             res.status(200).end(JSON.stringify({
                     successMessage: 'File is uploaded',
                     successCode: 'OK'
                 } || {}, null, 2));
         });
-    // });
 
 
 
@@ -63,35 +65,9 @@ function addFile(req,res,next) {
 
 function getFile(req, res, next) {
 
-    // setHeadersFile(res,function(res) {
         res.set('Content-Type', 'application/json');
         res.status(200).end(JSON.stringify({
                 successMessage: 'file catcher example',
                 successCode: 'OK'
             } || {}, null, 2));
-    // });
-}
-
-// function setHeadersFile(res, next) {
-//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-//     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-//     res.setHeader('Access-Control-Allow-Credentials', true);
-//
-//     next(res);
-// }
-
-function setMulterDest() {
-    multer({
-        dest: DIR,
-        rename: function (fieldname, filename) {
-            return filename + Date.now();
-        },
-        onFileUploadStart: function (file) {
-            console.log(file.originalname + ' is starting ...');
-        },
-        onFileUploadComplete: function (file) {
-            console.log(file.fieldname + ' uploaded to  ' + file.path);
-        }
-    });
 }

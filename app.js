@@ -118,8 +118,8 @@ try {
             });
 
             logger.info('Using token handler middleware');
-            //token.initialize();
-            //app.use(token.tokenHandler);
+            token.initialize();
+            app.use(token.tokenHandler);
 
             // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
             app.use(middleware.swaggerMetadata());

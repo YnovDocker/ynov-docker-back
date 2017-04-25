@@ -348,8 +348,41 @@
         },
         "/file": {
             "x-swagger-router-controller": "FileController",
-            "post": {
+            "options": {
                 "description": "add a 'file' object to data",
+                "operationId": "addFile",
+                "tags": [
+                    "File"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User successfully logged in",
+                        "schema": {
+                            "$ref": "#/definitions/SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request Error",
+                        "schema": {
+                            "$ref": "#/definitions/BadRequestError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found Error",
+                        "schema": {
+                            "$ref": "#/definitions/NotFoundError"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Stores an uploaded file. Returns file data.",
                 "operationId": "addFile",
                 "tags": [
                     "File"

@@ -246,8 +246,33 @@ paths:
   /file:
     # binds a127 app logic to a route
     x-swagger-router-controller: FileController
-    post:
+    options:
       description: add a 'file' object to data
+      # used as the method name of the controller
+      operationId: addFile
+      tags:
+        - File
+      responses:
+        "200":
+          description: User successfully logged in
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessResponse"
+        # responses may fall through to errors
+        "400":
+          description: Bad Request Error
+          schema:
+            $ref: "#/definitions/BadRequestError"
+        "404":
+          description: Not Found Error
+          schema:
+            $ref: "#/definitions/NotFoundError"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      description: Stores an uploaded file. Returns file data.
       # used as the method name of the controller
       operationId: addFile
       tags:
