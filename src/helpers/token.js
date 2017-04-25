@@ -66,16 +66,14 @@ module.exports.tokenHandler = function tokenHandler(req, res, next) {
     logger.debug('Handling token');
     let publicPath = false;
     //check the publicPath
-    for(let i = 0; i<config.publicPath.length; i ++)
-    {
+    for (let i = 0; i < config.publicPath.length; i++) {
         //logger.debug(config.publicPath[i]);
-        if(config.publicPath[i] === req.originalUrl)
-        {
+        if (config.publicPath[i] === req.originalUrl) {
             publicPath = true;
         }
     }
     //exception for /docs of swagger
-    if(req.originalUrl.lastIndexOf('/docs', 0) >= 0)
+    if (req.originalUrl.lastIndexOf('/docs', 0) >= 0)
         publicPath = true;
 
     if (publicPath) {
@@ -142,17 +140,14 @@ function isTokenValid(token) {
 function verifyToken(userId, tokenString, res, next) {
     User.findById(userId)
         .exec(function (err, user) {
-            if(err) {
+            if (err) {
                 logger.error(err);
                 next();
             }
             else {
-                if(user.connectionToken === tokenString)
-                    return true;
-                else
-                    return false;
+                return user.connectionToken === tokenString;
             }
-        })
+        });
 }
 
 function isTokenExpired(token) {
@@ -187,6 +182,6 @@ function renewToken(token) {
 module.exports.getToken = function getToken(req, cb) {
     let tokenGet = req.query.token || req.header(TOKEN_HEADER_NAME);
     //on set le token soit dans la query soit dans les headers
-    logger.info('get Token: '+ tokenGet);
+    logger.info('get Token: ' + tokenGet);
     cb(tokenGet);
 };

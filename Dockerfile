@@ -8,7 +8,12 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app/
 RUN npm install
 
+# Expose port 
 EXPOSE 10010
-ENV NODE_APP_INSTANCE dev
+
+# Export nodejs variable env
+ENV NODE_APP_INSTANCE prod
+
+# Entrypoint -> npm start
 CMD [ "npm", "start" ]
 

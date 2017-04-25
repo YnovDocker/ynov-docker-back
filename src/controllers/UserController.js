@@ -13,13 +13,13 @@ let util = require('util'),
     User = mongoose.model('User');
 
 module.exports = {
-        getUsers: getUsers,
-        getUserById: getUserById,
-        getUserByUsername: getUserByUsername,
-        register: register,
-        deleteUser: deleteUser,
-        updateUser: updateUser,
-        updatePassword: updatePassword
+    getUsers: getUsers,
+    getUserById: getUserById,
+    getUserByUsername: getUserByUsername,
+    register: register,
+    deleteUser: deleteUser,
+    updateUser: updateUser,
+    updatePassword: updatePassword
 };
 
 //Path: GET api/users
@@ -28,7 +28,7 @@ function getUsers(req, res, next) {
     //TODO add size param handling => see how to get the query params (using url package)
     // Code necessary to consume the User API and respond
     User.find({})
-        //.populate('address')
+    //.populate('address')
         .exec(function (err, users) {
             if (err)
                 return next(err);
@@ -45,7 +45,7 @@ function getUsers(req, res, next) {
                 res.end(JSON.stringify(users || {}, null, 2));
             }
         });
-};
+}
 
 // Path: GET api/users/{userId}/getUserById
 function getUserById(req, res, next) {
@@ -54,7 +54,7 @@ function getUserById(req, res, next) {
 
     logger.info('Getting the user with id:' + req.swagger.params.userId.value);
 
-    if(req.swagger.params.userId.value.length >= 12) {
+    if (req.swagger.params.userId.value.length >= 12) {
         // Code necessary to consume the User API and respond
         User.findById(req.swagger.params.userId.value)
             .exec(function (err, user) {
@@ -63,9 +63,9 @@ function getUserById(req, res, next) {
                 if (_.isNull(user) || _.isEmpty(user)) {
                     res.set('Content-Type', 'application/json');
                     res.status(404).json({
-                        errorMessage: 'User not found',
-                        errorCode: 'E_USER_NOT_FOUND'
-                    } || {}, null, 2);
+                            errorMessage: 'User not found',
+                            errorCode: 'E_USER_NOT_FOUND'
+                        } || {}, null, 2);
                 }
                 else {
                     res.set('Content-Type', 'application/json');
@@ -73,15 +73,14 @@ function getUserById(req, res, next) {
                 }
             });
     }
-    else
-    {
+    else {
         res.set('Content-Type', 'application/json');
         res.status(404).json({
                 errorMessage: 'Not in objectId',
                 errorCode: 'E_NOT_ID'
             } || {}, null, 2);
     }
-};
+}
 
 // Path: GET api/users/{username}/getUserByUsername
 function getUserByUsername(req, res, next) {
@@ -108,7 +107,7 @@ function getUserByUsername(req, res, next) {
                 res.status(200).end(JSON.stringify(user || {}, null, 2));
             }
         });
-};
+}
 
 
 //Path: POST  /user/register
@@ -118,7 +117,7 @@ function register(req, res, next) {
     User.alreadyTakenEmail(sanitizer.escape(req.swagger.params.userToAdd.value.email), function (err, isAlreadyTakenEmail) {
         if (!isAlreadyTakenEmail) {
 
-            if(req.swagger.params.userToAdd.value.password === req.swagger.params.userToAdd.value.passwordConfirmation) {
+            if (req.swagger.params.userToAdd.value.password === req.swagger.params.userToAdd.value.passwordConfirmation) {
                 let user = new User({
                     firstname: sanitizer.escape(req.swagger.params.userToAdd.value.firstname),
                     lastname: sanitizer.escape(req.swagger.params.userToAdd.value.lastname),
@@ -165,26 +164,23 @@ function register(req, res, next) {
                     }
                 });
             }
-            else
-            {
+            else {
                 res.set('Content-Type', 'application/json');
                 res.status(400).json({
                         errorMessage: 'password and confirmPassword is not equal',
                         errorCode: 'E_PWD_NOT_EQUAL'
                     } || {}, null, 2);
             }
-
         }
         else {
             res.set('Content-Type', 'application/json');
             res.status(401).end(JSON.stringify({
                     errorMessage: 'Email already used',
                     errorCode: 'E_EMAIL_USED'
-            } || {}, null, 2));
+                } || {}, null, 2));
         }
     });
-
-};
+}
 
 //TODO
 // Path: PUT api/users/{userId}/updateUser
@@ -212,7 +208,7 @@ function updateUser(req, res, next) {
                 res.status(200).end(JSON.stringify(updatedUser || {}, null, 2));
             }
         });
-};
+}
 
 // Path : PUT /users/{userId}/updatePassword
 function updatePassword(req, res, next) {
@@ -246,9 +242,9 @@ function updatePassword(req, res, next) {
                                 if (err) return next(err);
                                 res.set('Content-Type', 'application/json');
                                 res.status(200).end(JSON.stringify({
-                                    successMessage: 'password successfully modified',
-                                    successCode: 'PWD_UPDATED'
-                                } || {}, null, 2));
+                                        successMessage: 'password successfully modified',
+                                        successCode: 'PWD_UPDATED'
+                                    } || {}, null, 2));
                             });
                         });
                     }
@@ -269,7 +265,7 @@ function updatePassword(req, res, next) {
                 }
             });
         });
-};
+}
 
 // Path : PUT api/users/{userId}/deleteUser
 function deleteUser(req, res, next) {
@@ -292,4 +288,4 @@ function deleteUser(req, res, next) {
                 res.status(200).end(JSON.stringify(updatedUser || {}, null, 2));
             }
         });
-};
+}
