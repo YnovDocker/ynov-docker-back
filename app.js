@@ -14,19 +14,23 @@ const swaggerExpress = require('swagger-express-mw'),
 		mongoose = require('mongoose'),
 		multer = require('multer');
 
-
 mongoose.Promise = Promise;
 
 let logger = log4js.getLogger('server.core'),
-		token = require('./src/helpers/token');
+	token = require('./src/helpers/token');
 
 //config variable
 const swaggerSpecFilePath = __dirname + '/api/swagger.json';
 const port = process.env.PORT || 10010;
 
 function allowCORS(req, res, next) {
-		res.set("Access-Control-Allow-Origin", "*");
-		res.set("Access-Control-Allow-Credentials", true);
+	    //patch pour le ng2FileUploader
+	    // if(req.headers.origin === 'http://localhost:4200' && req.path === '/api/file')
+			// res.set("Access-Control-Allow-Origin", "http://localhost:4200");
+	    // else
+            res.set("Access-Control-Allow-Origin", "*");
+
+    	res.set("Access-Control-Allow-Credentials", true);
 		res.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
 		res.set("Access-Control-Expose-Headers", "Content-Type, token");
 		res.set("Access-Control-Allow-Methods", "GET, POST, PUT, HEAD, DELETE, OPTIONS");
@@ -35,6 +39,7 @@ function allowCORS(req, res, next) {
 
 //app
 let app = require('express')();
+
 
 logger.info('/*************** *************** ***************/');
 logger.info('/*************** STARTING SERVER ***************/');
@@ -57,7 +62,7 @@ try {
 
 				//using CORS
 				logger.info('Using CORS');
-				app.options('*', cors());
+				app.options('http://localhost:4200', cors());
 
 				module.exports = app; // for testing
 
@@ -145,7 +150,6 @@ try {
 								if (err) {
 										throw err;
 								}
-
 								// install middleware
 								swaggerExpress.register(app);
 

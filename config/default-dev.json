@@ -14,7 +14,7 @@
     ],
   "fileRepository": {
     "privatePath": "./ressources/images/",
-    "publicPath": ""
+    "publicPath": "./ressources/images/"
   },
   "server": {
     "mongo": {

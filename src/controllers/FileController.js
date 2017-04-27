@@ -14,88 +14,111 @@ let util = require('util'),
     sanitizer = require('sanitizer'),
     FileDB = require('../models/File'),
     File = mongoose.model('File'),
-    multer = require('multer'),
-    fs = require('fs');
+    fs = require('fs'),
+    path = require('path'),
+    upload_file = require('multer');
 
 const DIR = config.fileRepository.privatePath;
-let upload = multer({dest: DIR}).single('uploadFile');
-
+const supported_mimes = [
+    'image/png',
+    'image/jpeg',
+    'image/gif'
+];
 
 module.exports = {
-    addFile: addFile,
-    getFile: getFile
+    optionFile: optionFile,
+    getFile: getFile,
+    upload: upload
 };
 
-function addFile(req,res) {
+upload_file({ dest: './ressources/images'}).any();
 
+function upload(req, res, next) {
+    let file = req.swagger.params.file.value;
+    logger.info('upload file ... ');
 
-    upload(req, res, function (err) {
-        if (err) {
-            return res.end(err.toString());
-        }
-
+    if (supported_mimes.indexOf(file.mimetype) === -1) {
+        logger.debug('File not supported for upload');
         res.set('Content-Type', 'application/json');
-        res.status(200).end(JSON.stringify({
-                successMessage: 'File is uploaded',
-                successCode: 'OK'
-            } || {}, null, 2));
+        res.status(401).end(JSON.stringify({
+            errorMessage: 'File type not supported for uploads',
+            errorCode: 'E_FILE_NOT_SUPPORTED'
+        }, null, 2));
+    }
+
+    let userId = req.swagger.params.userId.value;
+    let fileName = file.originalname.substr(0, file.originalname.lastIndexOf('.'));
+
+    let fileToUpload = new File({
+        fileName : fileName,
+        fileSize: file.size,
+        fileExt: file.originalname.substr(file.originalname.lastIndexOf('.')+1),
+        fileType: 'IMAGE',
+        userId: userId,
+        publicLink: config.fileRepository.publicPath + userId + '/' + file.originalname,
+        privateLink: config.fileRepository.privatePath + userId + '/' + file.originalname
     });
 
+    logger.debug('File: '+ fileToUpload);
+
+    fileToUpload.save(function (err, fileCreated) {
+        if (err) {
+            logger.error("got an error while creating file: ", err);
+            return next(err);
+        }
+
+        if (_.isNull(fileCreated) || _.isEmpty(fileCreated)) {
+            res.set('Content-Type', 'application/json');
+            res.status(404).json({error: 'Error while creating file in mongo'} || {}, null, 2);
+        }
+        else {
+            logger.info('File Save in mongoDB, need to save the buffer now ...');
+
+            let path = config.fileRepository.privatePath + userId + '/';
+            // let dirname = path.dirname(path);
+            // logger.debug(dirname);
+            if (!fs.existsSync(path)) {
+                logger.info('directory not exist, need to create it ...');
+                fs.mkdirSync(path);
+            }
+
+            fs.writeFile( path + file.originalname, file.buffer , function (err) {
+                if (err) {
+                    logger.error(err);
+
+                    res.set('Content-Type', 'application/json');
+                    res.status(401).end(JSON.stringify({
+                        errorMessage: 'File not uploaded',
+                        errorCode: 'E_FILE_NOT_UPLOADED'
+                    }, null, 2));
+                }
+                else {
+                    logger.info('file Upload in directory ...');
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).end(JSON.stringify(fileToUpload)|| {}, null, 2);
+                }
 
 
-
-    //let userId = req.swagger.params.userId.value;
-    //let fileNameToUpload = req.swagger.params.fileToAdd.value.fileName;
-    // let fileSize;
-    // let fileExt;
-
-
-    //logger.debug('filename: '+ fileNameToUpload);
-    //logger.debug('fileType: '+ req.swagger.params.fileToAdd.value.fileType);
-
-
-    /*let file = new File({
-     filename : fileNameToUpload,
-     filesize: fileSize,
-     fileExt: fileExt,
-     fileType: req.swagger.params.fileToAdd.value.fileType,
-     publicLink: config.fileRepository.publicPath + '/' + userId + '/' + fileNameToUpload,
-     privateLink: config.fileRepository.privatePath + '/' + userId + '/' + fileNameToUpload
-     })*/
-
+            });
+        }
+    });
 }
 
-function getFile(req, res, next) {
+// return status 200 for the pre flight
+function optionFile(req, res) {
+    logger.debug('pre flight: ' + req.method);
+    res.set('Content-Type', 'application/json');
+    res.status(200).end(JSON.stringify({
+            successMessage: 'Pre flight request',
+            successCode: 'OK'
+        } || {}, null, 2));
+}
 
-    // setHeadersFile(res,function(res) {
+function getFile(req, res) {
+    logger.debug('test');
     res.set('Content-Type', 'application/json');
     res.status(200).end(JSON.stringify({
             successMessage: 'file catcher example',
             successCode: 'OK'
         } || {}, null, 2));
-    // });
 }
-
-// function setHeadersFile(res, next) {
-//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-//     res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-//     res.setHeader('Access-Control-Allow-Credentials', true);
-//
-//     next(res);
-// }
-
-// function setMulterDest() {
-//     multer({
-//         dest: DIR,
-//         rename: function (fieldname, filename) {
-//             return filename + Date.now();
-//         },
-//         onFileUploadStart: function (file) {
-//             console.log(file.originalname + ' is starting ...');
-//         },
-//         onFileUploadComplete: function (file) {
-//             console.log(file.fieldname + ' uploaded to  ' + file.path);
-//         }
-//     });
-// }

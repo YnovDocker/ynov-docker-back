@@ -346,17 +346,26 @@
                 }
             }
         },
-        "/file": {
+        "/file/{userId}": {
             "x-swagger-router-controller": "FileController",
             "options": {
                 "description": "add a 'file' object to data",
-                "operationId": "addFile",
+                "operationId": "optionFile",
                 "tags": [
                     "File"
                 ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "User successfully logged in",
+                        "description": "pre flight ok / don't use this route",
                         "schema": {
                             "$ref": "#/definitions/SuccessResponse"
                         }
@@ -383,42 +392,27 @@
             },
             "post": {
                 "description": "Stores an uploaded file. Returns file data.",
-                "operationId": "addFile",
+                "operationId": "upload",
                 "tags": [
                     "File"
                 ],
-                "responses": {
-                    "200": {
-                        "description": "User successfully logged in",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponse"
-                        }
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
                     },
-                    "400": {
-                        "description": "Bad Request Error",
-                        "schema": {
-                            "$ref": "#/definitions/BadRequestError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found Error",
-                        "schema": {
-                            "$ref": "#/definitions/NotFoundError"
-                        }
-                    },
-                    "default": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "type": "file",
+                        "description": "The file to upload."
                     }
-                }
-            },
-            "get": {
-                "description": "get a 'file' object to data",
-                "operationId": "getFile",
-                "tags": [
-                    "File"
                 ],
                 "responses": {
                     "200": {

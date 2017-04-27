@@ -243,18 +243,24 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /file:
+  /file/{userId}:
     # binds a127 app logic to a route
     x-swagger-router-controller: FileController
     options:
       description: add a 'file' object to data
       # used as the method name of the controller
-      operationId: addFile
+      operationId: optionFile
       tags:
         - File
+      parameters:
+        - name: userId
+          in: path
+          description: a id of an user
+          required: true
+          type: string
       responses:
         "200":
-          description: User successfully logged in
+          description: pre flight ok / don't use this route
           schema:
             # a pointer to a definition
             $ref: "#/definitions/SuccessResponse"
@@ -274,34 +280,21 @@ paths:
     post:
       description: Stores an uploaded file. Returns file data.
       # used as the method name of the controller
-      operationId: addFile
+      operationId: upload
       tags:
         - File
-      responses:
-        "200":
-          description: User successfully logged in
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/SuccessResponse"
-        # responses may fall through to errors
-        "400":
-          description: Bad Request Error
-          schema:
-            $ref: "#/definitions/BadRequestError"
-        "404":
-          description: Not Found Error
-          schema:
-            $ref: "#/definitions/NotFoundError"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    get:
-      description: get a 'file' object to data
-      # used as the method name of the controller
-      operationId: getFile
-      tags:
-        - File
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: userId
+          in: path
+          description: a id of an user
+          required: true
+          type: string
+        - in: formData
+          name: file
+          type: file
+          description: The file to upload.
       responses:
         "200":
           description: User successfully logged in

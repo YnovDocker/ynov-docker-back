@@ -14,6 +14,7 @@ let File = new Schema({
     fileSize: {type: Number, required: true},
     fileExt: {type: String, required: true},
     fileType: {type: String, required: true},
+    userId: { type: String, required: true},
     //link to access in the file repository
     privateLink: {type: String, required: true},
     publicLink: {type: String, required: true},
