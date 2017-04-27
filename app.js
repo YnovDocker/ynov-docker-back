@@ -62,7 +62,7 @@ try {
 
 				//using CORS
 				logger.info('Using CORS');
-				app.options('http://localhost:4200', cors());
+				app.options('*', cors());
 
 				module.exports = app; // for testing
 
