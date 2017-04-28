@@ -122,7 +122,7 @@ function register(req, res, next) {
                     firstname: sanitizer.escape(req.swagger.params.userToAdd.value.firstname),
                     lastname: sanitizer.escape(req.swagger.params.userToAdd.value.lastname),
                     username: sanitizer.escape(req.swagger.params.userToAdd.value.username),
-                    birthDate: sanitizer.escape(req.swagger.params.userToAdd.value.birthDate),
+                    birthDate: sanitizer.escape(req.swagger.params.userToAdd.value.birthDate) || null,
                     email: sanitizer.escape(req.swagger.params.userToAdd.value.email),
                     password: sanitizer.escape(req.swagger.params.userToAdd.value.password),
                 });
