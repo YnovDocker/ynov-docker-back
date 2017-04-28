@@ -25,8 +25,6 @@ module.exports = {
 //Path: GET api/users
 function getUsers(req, res, next) {
     logger.info('Getting all users from db...');
-    //TODO add size param handling => see how to get the query params (using url package)
-    // Code necessary to consume the User API and respond
     User.find({})
     //.populate('address')
         .exec(function (err, users) {
@@ -116,7 +114,6 @@ function register(req, res, next) {
     //check if email isn't already taken
     User.alreadyTakenEmail(sanitizer.escape(req.swagger.params.userToAdd.value.email), function (err, isAlreadyTakenEmail) {
         if (!isAlreadyTakenEmail) {
-
             if (req.swagger.params.userToAdd.value.password === req.swagger.params.userToAdd.value.passwordConfirmation) {
                 let user = new User({
                     firstname: sanitizer.escape(req.swagger.params.userToAdd.value.firstname),
