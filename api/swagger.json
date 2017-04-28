@@ -442,6 +442,112 @@
                 }
             }
         },
+        "/file/{userId}/getFileByUserId": {
+            "x-swagger-router-controller": "FileController",
+            "get": {
+                "description": "get an 'file' object",
+                "operationId": "getFileByUserId",
+                "tags": [
+                    "File"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "a id of an user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get an array of 'file' object",
+                        "schema": {
+                            "title": "FilesArray",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/File"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/file/{fileId}/getFileById": {
+            "x-swagger-router-controller": "FileController",
+            "get": {
+                "description": "get an 'file' object",
+                "operationId": "getFileById",
+                "tags": [
+                    "File"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "fileId",
+                        "in": "path",
+                        "description": "a id of a file",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'file' object",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                }
+            }
+        },
+        "/file/{fileId}/deleteFile": {
+            "x-swagger-router-controller": "FileController",
+            "put": {
+                "description": "deactivate an 'file' object",
+                "operationId": "deleteFile",
+                "tags": [
+                    "File"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "fileId",
+                        "in": "path",
+                        "description": "a id of a file",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a 'file' object",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                }
+            }
+        },
         "/swagger": {
             "x-swagger-pipe": "swagger_raw"
         }

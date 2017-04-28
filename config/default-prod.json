@@ -14,7 +14,7 @@
     ],
   "fileRepository": {
     "privatePath": "./ressources/images/",
-    "publicPath": ""
+    "publicPath": "nanslaupretre.fr:10010/ressources/images/"
   },
   "server": {
     "mongo": {
@@ -26,6 +26,7 @@
       }
     },
     "host": "nanslaupretre.fr",
+    "frontUrl": "nanslaupretre.fr:4200",
     "auth": {
       "tokenDuration": {
         "unit": "hours",

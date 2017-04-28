@@ -16,7 +16,8 @@ let util = require('util'),
     File = mongoose.model('File'),
     fs = require('fs'),
     path = require('path'),
-    upload_file = require('multer');
+    upload_file = require('multer'),
+    ObjectID = require('mongodb').ObjectID;
 
 const DIR = config.fileRepository.privatePath;
 const supported_mimes = [
@@ -27,7 +28,9 @@ const supported_mimes = [
 
 module.exports = {
     optionFile: optionFile,
-    getFile: getFile,
+    getFileById: getFileById,
+    getFileByUserId: getFileByUserId,
+    deleteFile: deleteFile,
     upload: upload
 };
 
@@ -49,14 +52,16 @@ function upload(req, res, next) {
     let userId = req.swagger.params.userId.value;
     let fileName = file.originalname.substr(0, file.originalname.lastIndexOf('.'));
 
+    let objectId = new ObjectID();
     let fileToUpload = new File({
+        _id: objectId,
         fileName : fileName,
         fileSize: file.size,
         fileExt: file.originalname.substr(file.originalname.lastIndexOf('.')+1),
         fileType: 'IMAGE',
         userId: userId,
-        publicLink: config.fileRepository.publicPath + userId + '/' + file.originalname,
-        privateLink: config.fileRepository.privatePath + userId + '/' + file.originalname
+        publicLink: config.fileRepository.publicPath + userId + '/' + objectId+'.'+file.originalname.substr(file.originalname.lastIndexOf('.')+1),
+        privateLink: config.fileRepository.privatePath + userId + '/' + objectId+'.'+file.originalname.substr(file.originalname.lastIndexOf('.')+1)
     });
 
     logger.debug('File: '+ fileToUpload);
@@ -82,7 +87,7 @@ function upload(req, res, next) {
                 fs.mkdirSync(path);
             }
 
-            fs.writeFile( path + file.originalname, file.buffer , function (err) {
+            fs.writeFile( path + fileCreated._id+'.'+fileCreated.fileExt, file.buffer , function (err) {
                 if (err) {
                     logger.error(err);
 
@@ -108,17 +113,86 @@ function upload(req, res, next) {
 function optionFile(req, res) {
     logger.debug('pre flight: ' + req.method);
     res.set('Content-Type', 'application/json');
+    // res.set("Access-Control-Allow-Origin", "http://localhost:4200");
+    // res.set("Access-Control-Allow-Credentials", false);
     res.status(200).end(JSON.stringify({
             successMessage: 'Pre flight request',
             successCode: 'OK'
         } || {}, null, 2));
 }
 
-function getFile(req, res) {
-    logger.debug('test');
-    res.set('Content-Type', 'application/json');
-    res.status(200).end(JSON.stringify({
-            successMessage: 'file catcher example',
-            successCode: 'OK'
-        } || {}, null, 2));
+function getFileById(req, res) {
+    logger.info('Getting the file with id:' + req.swagger.params.fileId.value);
+
+    if (req.swagger.params.fileId.value.length >= 12) {
+        // Code necessary to consume the User API and respond
+        File.findById(req.swagger.params.fileId.value)
+            .exec(function (err, file) {
+                if (err)
+                    return next(err);
+                if (_.isNull(file) || _.isEmpty(file)) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(404).json({
+                            errorMessage: 'File not found',
+                            errorCode: 'E_FILE_NOT_FOUND'
+                        } || {}, null, 2);
+                }
+                else {
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).end(JSON.stringify(file || {}, null, 2));
+                }
+            });
+    }
+    else {
+        res.set('Content-Type', 'application/json');
+        res.status(404).json({
+                errorMessage: 'Not in objectId',
+                errorCode: 'E_NOT_ID'
+            } || {}, null, 2);
+    }
 }
+
+function getFileByUserId(req, res) {
+    let userId = req.swagger.params.userId.value;
+
+    File.find({userId: userId, active: true})
+        .exec(function (err, files) {
+            if (err)
+                return next(err);
+
+            if (_.isNull(files) || _.isEmpty(files)) {
+                res.set('Content-Type', 'application/json');
+                res.status(404).json({
+                    errorMessage: "Couldn't gets files",
+                    errorCode: "E_NO_FILES_FOUND"
+                }, null, 2);
+            }
+            else {
+                res.set('Content-Type', 'application/json');
+                res.end(JSON.stringify(files || {}, null, 2));
+            }
+        });
+}
+
+function deleteFile(req, res, next) {
+    logger.info('Deactivating for file with id:\n ' + req.swagger.params.fileId.value);
+    File.findOneAndUpdate(
+        {_id: req.swagger.params.fileId.value},
+        {
+            $set: {
+                active: false
+            }
+        },
+        {new: true}, //means we want the DB to return the updated document instead of the old one
+        function (err, updatedFile) {
+            if (err) {
+                return next(err);
+            }
+            else {
+                logger.debug("Deactivated file object: \n" + updatedFile);
+                res.set('Content-Type', 'application/json');
+                res.status(200).end(JSON.stringify(updatedFile || {}, null, 2));
+            }
+        });
+}
+

@@ -14,7 +14,7 @@
     ],
   "fileRepository": {
     "privatePath": "./ressources/images/",
-    "publicPath": "./ressources/images/"
+    "publicPath": "file:///Users/tdoret/Documents/Projet_JS/ynov-docker-back/ressources/images/"
   },
   "server": {
     "mongo": {
@@ -26,6 +26,7 @@
       }
     },
     "host": "127.0.0.1",
+    "frontUrl": "http://localhost:4200",
     "auth": {
       "tokenDuration": {
         "unit": "hours",
