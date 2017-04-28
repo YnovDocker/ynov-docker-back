@@ -24,9 +24,8 @@ const swaggerSpecFilePath = __dirname + '/api/swagger.json';
 const port = process.env.PORT || 10010;
 
 //CORS config
-let originsWhitelist = [
-    config.server.frontUrl
-];
+let originsWhitelist = config.server.frontUrl;
+
 // logger.debug(originsWhitelist);
 let corsOptions = {
     origin: function(origin, callback){
@@ -42,8 +41,8 @@ let app = require('express')();
 function allowCORS(req, res, next) {
 
 	//patch pour ng2 file
-    if(req.headers.origin === config.server.frontUrl && req.path.indexOf('/api/file') !== -1)
-        res.set("Access-Control-Allow-Origin", config.server.frontUrl);
+    if(originsWhitelist.indexOf(req.headers.origin) !== -1 && req.path.indexOf('/api/file') !== -1)
+        res.set("Access-Control-Allow-Origin", req.headers.origin);
     else
 		res.set("Access-Control-Allow-Origin", "*");
 

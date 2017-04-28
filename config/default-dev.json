@@ -26,7 +26,10 @@
       }
     },
     "host": "127.0.0.1",
-    "frontUrl": "http://localhost:4200",
+    "frontUrl": [
+      "http://localhost:4200",
+      "nanslaupretre.fr:4200"
+    ],
     "auth": {
       "tokenDuration": {
         "unit": "hours",
