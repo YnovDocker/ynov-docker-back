@@ -13,6 +13,8 @@ EXPOSE 10010
 
 # Export nodejs variable env
 ENV NODE_APP_INSTANCE prod
+ENV NODE_APP_HOST localhost
+ENV NODE_APP_PORT 10010
 
 # Entrypoint -> npm start
 CMD [ "npm", "start" ]
