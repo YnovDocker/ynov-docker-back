@@ -605,8 +605,7 @@
                 "passwordConfirmation",
                 "email",
                 "firstname",
-                "lastname",
-                "birthDate"
+                "lastname"
             ],
             "properties": {
                 "username": {

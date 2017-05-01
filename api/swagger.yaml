@@ -427,7 +427,6 @@ definitions:
       - email
       - firstname
       - lastname
-      - birthDate
     properties:
       username:
         type: string
