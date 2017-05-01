@@ -5,6 +5,8 @@ Run environment :
 ```bash
 npm install
 export NODE_APP_INSTANCE=dev
+export NODE_APP_PORT=10010
+export NODE_APP_HOST=localhost
 npm start
 ```
 Access :

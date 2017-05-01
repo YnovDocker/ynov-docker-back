@@ -14,7 +14,7 @@
     ],
   "fileRepository": {
     "privatePath": "./ressources/images/",
-    "publicPath": "file:///Users/tdoret/Documents/Projet_JS/ynov-docker-back/ressources/images/"
+    "publicPath": "file://{host}/ressources/images/"
   },
   "server": {
     "mongo": {

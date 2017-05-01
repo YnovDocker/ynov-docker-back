@@ -14,7 +14,7 @@
     ],
   "fileRepository": {
     "privatePath": "./ressources/images/",
-    "publicPath": "nanslaupretre.fr:10010/ressources/images/"
+    "publicPath": "{host}/ressources/images/"
   },
   "server": {
     "mongo": {

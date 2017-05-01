@@ -12,6 +12,7 @@ const swaggerExpress = require('swagger-express-mw'),
 		path = require('path'),
 		cors = require('cors'),
 		yaml = require('js-yaml'),
+		_ = require('lodash'),
 		fs = require('fs'),
 		jsonfile = require('jsonfile'),
 		config = require('config'),
@@ -34,7 +35,7 @@ let originsWhitelist = config.server.frontUrl;
 // logger.debug(originsWhitelist);
 let corsOptions = {
 		origin: function (origin, callback) {
-				var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
+				const isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
 				callback(null, isWhitelisted);
 		},
 		credentials: true
@@ -76,10 +77,14 @@ try {
 				//initialize swagger.json
 				logger.info('Using spec file: ' + swaggerSpecFilePath);
 				let swaggerDoc = require(swaggerSpecFilePath);
+				let swaggerDocStringified = JSON.stringify(swaggerDoc);
 				const port = !!process.env.NODE_APP_PORT ? process.env.NODE_APP_PORT : config.server.port;
 				const host = !!process.env.NODE_APP_HOST ? process.env.NODE_APP_HOST : config.server.host;
 				swaggerDoc.host = host + ':' + port;
+				_.replace(swaggerDocStringified, '/^\{(host)\}$/gm', swaggerDoc.host);
 				logger.info('Server will run at: ' + JSON.stringify(swaggerDoc.host));
+
+				swaggerDoc = JSON.parse(swaggerDocStringified);
 
 				logger.info('Using CORS');
 				app.use(cors(corsOptions));
