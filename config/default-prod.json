@@ -28,7 +28,7 @@
     "host": "nanslaupretre.fr",
     "frontUrl": [
       "http://localhost:4200",
-      "nanslaupretre.fr:4200"
+      "http://nanslaupretre.fr:4200"
     ],
     "auth": {
       "tokenDuration": {

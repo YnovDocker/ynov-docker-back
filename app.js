@@ -92,18 +92,6 @@ try {
 
             app.use(log4js.connectLogger(log4js.getLogger('server.http'), {level: log4js.levels.INFO}));
             app.use(allowCORS);
-            // app.use(function(req, res, next) {
-            //     if(req.headers.origin === 'http://localhost:4200' && req.path.indexOf('/api/file') !== -1) {
-            //         logger.debug('file');
-            //         app.use("http://localhost:4200", cors());
-            //         next();
-            //     }
-            //     else {
-            //         logger.debug('not file');
-            //         next();
-            //     }
-            // })
-
 
             //connect to the mongo DB
             const mongoUrl = config.server.mongo.connectionString;
