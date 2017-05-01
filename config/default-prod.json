@@ -26,6 +26,7 @@
       }
     },
     "host": "nanslaupretre.fr",
+    "port": 10010,
     "frontUrl": [
       "http://localhost:4200",
       "http://nanslaupretre.fr:4200"
