@@ -30,11 +30,12 @@ module.exports = {
     optionFile: optionFile,
     getFileById: getFileById,
     getFileByUserId: getFileByUserId,
+    getBinaryFile: getBinaryFile,
     deleteFile: deleteFile,
     upload: upload
 };
 
-upload_file({ dest: './ressources/images'}).any();
+upload_file({dest: './ressources/images'}).any();
 
 function upload(req, res, next) {
     let file = req.swagger.params.file.value;
@@ -43,7 +44,7 @@ function upload(req, res, next) {
     if (supported_mimes.indexOf(file.mimetype) === -1) {
         logger.debug('File not supported for upload');
         res.set('Content-Type', 'application/json');
-        res.status(401).end(JSON.stringify({
+        res.status(400).end(JSON.stringify({
             errorMessage: 'File type not supported for uploads',
             errorCode: 'E_FILE_NOT_SUPPORTED'
         }, null, 2));
@@ -55,16 +56,16 @@ function upload(req, res, next) {
     let objectId = new ObjectID();
     let fileToUpload = new File({
         _id: objectId,
-        fileName : fileName,
+        fileName: fileName,
         fileSize: file.size,
-        fileExt: file.originalname.substr(file.originalname.lastIndexOf('.')+1),
+        fileExt: file.originalname.substr(file.originalname.lastIndexOf('.') + 1),
         fileType: 'IMAGE',
         userId: userId,
-        publicLink: config.fileRepository.publicPath + userId + '/' + objectId+'.'+file.originalname.substr(file.originalname.lastIndexOf('.')+1),
-        privateLink: config.fileRepository.privatePath + userId + '/' + objectId+'.'+file.originalname.substr(file.originalname.lastIndexOf('.')+1)
+        publicLink: config.fileRepository.publicPath + userId + '/' + objectId + '.' + file.originalname.substr(file.originalname.lastIndexOf('.') + 1),
+        privateLink: config.fileRepository.privatePath + userId + '/' + objectId + '.' + file.originalname.substr(file.originalname.lastIndexOf('.') + 1)
     });
 
-    logger.debug('File: '+ fileToUpload);
+    logger.debug('File: ' + fileToUpload);
 
     fileToUpload.save(function (err, fileCreated) {
         if (err) {
@@ -87,7 +88,7 @@ function upload(req, res, next) {
                 fs.mkdirSync(path);
             }
 
-            fs.writeFile( path + fileCreated._id+'.'+fileCreated.fileExt, file.buffer , function (err) {
+            fs.writeFile(path + fileCreated._id + '.' + fileCreated.fileExt, file.buffer, function (err) {
                 if (err) {
                     logger.error(err);
 
@@ -100,10 +101,8 @@ function upload(req, res, next) {
                 else {
                     logger.info('file Upload in directory ...');
                     res.set('Content-Type', 'application/json');
-                    res.status(200).end(JSON.stringify(fileToUpload)|| {}, null, 2);
+                    res.status(200).end(JSON.stringify(fileToUpload) || {}, null, 2);
                 }
-
-
             });
         }
     });
@@ -172,6 +171,23 @@ function getFileByUserId(req, res) {
                 res.end(JSON.stringify(files || {}, null, 2));
             }
         });
+}
+
+function getBinaryFile(req, res, next) {
+    let file = path.join(DIR, req.path.replace(/\/$/, '/index.html'));
+    if (file.indexOf(DIR + path.sep) !== 0) {
+        return res.status(403).end('Forbidden');
+    }
+    let type = supported_mimes[path.extname(file).slice(1)] || 'text/plain';
+    let s = fs.createReadStream(file);
+    s.on('open', function () {
+        res.set('Content-Type', type);
+        s.pipe(res);
+    });
+    s.on('error', function () {
+        res.set('Content-Type', 'text/plain');
+        res.status(404).end('Not found');
+    });
 }
 
 function deleteFile(req, res, next) {

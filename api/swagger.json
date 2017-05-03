@@ -514,6 +514,40 @@
                 }
             }
         },
+        "/file/{fileId}/getBinaryFile": {
+            "x-swagger-router-controller": "FileController",
+            "get": {
+                "description": "get a binary 'file' object",
+                "operationId": "getBinaryFile",
+                "tags": [
+                    "File"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "fileId",
+                        "in": "path",
+                        "description": "a id of a file",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get a binary 'file' object",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                }
+            }
+        },
         "/file/{fileId}/deleteFile": {
             "x-swagger-router-controller": "FileController",
             "put": {
