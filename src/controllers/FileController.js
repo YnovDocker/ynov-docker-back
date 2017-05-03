@@ -174,20 +174,56 @@ function getFileByUserId(req, res) {
 }
 
 function getBinaryFile(req, res, next) {
-    let file = path.join(DIR, req.path.replace(/\/$/, '/index.html'));
-    if (file.indexOf(DIR + path.sep) !== 0) {
-        return res.status(403).end('Forbidden');
+    let mime = require('mime');
+    let fileId = req.swagger.params.fileId.value;
+
+    logger.info('Getting the file with id:' + req.swagger.params.fileId.value);
+
+    if (req.swagger.params.fileId.value.length >= 12) {
+        // Code necessary to consume the User API and respond
+        File.findById(req.swagger.params.fileId.value)
+            .exec(function (err, file) {
+                if (err)
+                    return next(err);
+                if (_.isNil(file) || _.isEmpty(file)) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(404).json({
+                            errorMessage: 'File not found',
+                            errorCode: 'E_FILE_NOT_FOUND'
+                        } || {}, null, 2);
+                }
+                else {
+                    let objectId = file._id;
+                    let filePath = path.resolve(__dirname + '/../../' + config.fileRepository.privatePath, file.userId + '/' + objectId + '.' + file.fileExt);
+                    let filename = path.basename(filePath);
+                    let mimetype = mime.lookup(filePath);
+
+                    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+                    res.setHeader('Content-type', mimetype);
+
+                    let filestream = fs.createReadStream(filePath);
+                    filestream.pipe(res);
+                    // let type = supported_mimes[path.extname(file.publicLink).slice(1)] || 'text/plain';
+                    // let s = fs.createReadStream(file.publicLink);
+                    // s.on('open', function () {
+                    //     res.set('Content-Type', type);
+                    //     s.pipe(res);
+                    // });
+                    // s.on('error', function () {
+                    //     res.set('Content-Type', 'text/plain');
+                    //     res.status(404).end('Not found');
+                    // });
+                    // res.set('Content-Type', 'application/json');
+                }
+            });
     }
-    let type = supported_mimes[path.extname(file).slice(1)] || 'text/plain';
-    let s = fs.createReadStream(file);
-    s.on('open', function () {
-        res.set('Content-Type', type);
-        s.pipe(res);
-    });
-    s.on('error', function () {
-        res.set('Content-Type', 'text/plain');
-        res.status(404).end('Not found');
-    });
+    else {
+        res.set('Content-Type', 'application/json');
+        res.status(404).json({
+                errorMessage: 'Not in objectId',
+                errorCode: 'E_NOT_ID'
+            } || {}, null, 2);
+    }
 }
 
 function deleteFile(req, res, next) {
