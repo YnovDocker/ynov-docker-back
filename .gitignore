@@ -35,3 +35,9 @@ node_modules
 
 # Runtime configuration for swagger app
 config/runtime.yaml
+
+# Codeship CI/CD related
+codeship.aes
+env
+env.encrypted
+dockercfg.encrypted
